@@ -12,9 +12,9 @@ public class Config {
 	private static Properties prop = new Properties();
 
 	public static boolean DEBUG = false; // Enables print out of the config being sent to the client
-	static String WINDOW_TITLE = "Open RSC"; // Only set here due to config not set by server fast enough at load time
-	public static String SERVER_NAME = "Runescape";
-	public static String SERVER_NAME_WELCOME = "Runescape Classic";
+	static String WINDOW_TITLE = "Runescape Classic 04"; // Only set here due to config not set by server fast enough at load time
+	public static String SERVER_NAME = "Classic04";
+	public static String SERVER_NAME_WELCOME = "Runescape Classic 04";
 	public static String WELCOME_TEXT = "You need a members account to use this server";
 	public static String SERVER_IP = null; // Modify this to override "Cache/ip.txt"
 	public static int SERVER_PORT; // Modify SERVER_IP above to override "Cache/port.txt" with this value
@@ -23,7 +23,7 @@ public class Config {
 	public static boolean MEMBER_WORLD = false;
 	public static boolean DISPLAY_LOGO_SPRITE = false;
 	private static final boolean CUSTOM_CACHE_DIR_ENABLED = false;
-	private static final String CUSTOM_CACHE_DIR = System.getProperty("user.home") + File.separator + "OpenRSC";
+	private static final String CUSTOM_CACHE_DIR = System.getProperty("user.home") + File.separator + "RSC04";
 	public static String F_CACHE_DIR = "";
 
 	public static final int INVENTORY_TAB = 1;
@@ -50,7 +50,7 @@ public class Config {
 	public static boolean C_INV_COUNT = false;
 	public static boolean C_PARTY_INV = false;
 	public static int C_ZOOM;
-	public static boolean C_CUSTOM_UI = false; // Enables a osrs style UI
+	public static boolean C_CUSTOM_UI = true; // Enables a osrs style UI
 	public static boolean C_HIDE_LOGIN_BOX = false;
 	public static boolean C_BLOCK_GLOBAL_FRIEND = false;
 	public static int C_MOVE_PER_FRAME = 4;
