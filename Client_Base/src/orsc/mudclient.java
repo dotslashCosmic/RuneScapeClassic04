@@ -84,7 +84,7 @@ public final class mudclient implements Runnable {
 	public final int[] bankItemOnTab = new int[500];
 	public final int[] equipIconXLocations = new int[]{98, 98, 98, 153, 43, 43, 98, 98, 43, 153, 153};
 	public final int[] equipIconYLocations = new int[]{5, 85, 125, 85, 85, 165, 165, 45, 45, 45, 165};
-	public final String[] equipmentStatNames = new String[]{"Armour", "WeaponAim", "WeaponPower", "Magic",
+	public final String[] equipmentStatNames = new String[]{"Armor", "WeaponAim", "WeaponPower", "Magic",
 		"Prayer"};
 	public final int[] playerStatEquipment = new int[5];
 	private final int[] mouseClickX = new int[8192];
@@ -354,24 +354,24 @@ public final class mudclient implements Runnable {
 	int passwordRecoverCancel;
 	int[] controlPassQuestion = new int[5];
 	int[] controlPassAnswer = new int[5];
-	String[] questions = {"Where were you born?",
-		"What was your first teacher's name?",
-		"What is your father's middle name?",
-		"Who was your first best friend?",
-		"What is your favourite vacation spot?",
-		"What is your mother's middle name?",
-		"What was your first pet's name?",
-		"What was the name of your first school?",
-		"What is your mother's maiden name?",
-		"Who was your first boyfriend/girlfriend?",
-		"What was the first computer game you purchased?",
-		"Who is your favourite actor/actress?",
-		"Who is your favourite author?",
-		"Who is your favourite musician?",
-		"Who is your favourite cartoon character?",
-		"What is your favourite book?",
-		"What is your favourite food?",
-		"What is your favourite movie?"};
+	String[] questions = {
+		"What is the name of your childhood best friend?",
+		"What city did you grow up in?",
+		"What is your favorite family vacation destination?",
+		"What was the name of your first pet?",
+		"What was your favorite subject in school?",
+		"What is your mother's first name?",
+		"What was the name of your first car?",
+		"What is your favorite movie quote?",
+		"What was the name of your first employer?",
+		"What is your dream job?",
+		"What is your favorite hobby?",
+		"What is the name of your favorite teacher?",
+		"What is your favorite sports team?",
+		"What is the name of the street you grew up on?",
+		"What was the name of your first concert?",
+		"What is your favorite board game?",
+		"What was your favorite childhood toy?"};
 	boolean drawMinimap = true;
 	//private final int[] duelOpponentConfirmItemCount = new int[8];
 	//private final int[] duelOpponentItemId = new int[8];
@@ -867,42 +867,46 @@ public final class mudclient implements Runnable {
 		return false;
 	}
 
-	public byte[] unpackData(String filename, String fileTitle, int startPercentage) {
-		int decmp_len = 0;
-		int cmp_len = 0;
-		byte[] data = null;
-		try {
-			clientPort.showLoadingProgress(startPercentage, "Loading " + fileTitle + " - 0%");
-			java.io.InputStream inputstream = DataOperations.streamFromPath(clientPort.getCacheLocation() + filename);
-			DataInputStream datainputstream = new DataInputStream(inputstream);
-			byte[] headers = new byte[6];
-			datainputstream.readFully(headers, 0, 6);
-			decmp_len = ((headers[0] & 0xFF) << 16) + ((headers[1] & 0xFF) << 8) + (headers[2] & 0xFF);
-			cmp_len = ((headers[3] & 0xFF) << 16) + ((headers[4] & 0xFF) << 8) + (headers[5] & 0xFF);
-			clientPort.showLoadingProgress(startPercentage, "Loading " + fileTitle + " - 5%");
-			int l = 0;
-			data = new byte[cmp_len];
-			while (l < cmp_len) {
-				int i1 = cmp_len - l;
-				if (i1 > 1000)
-					i1 = 1000;
-				datainputstream.readFully(data, l, i1);
-				l += i1;
-				clientPort.showLoadingProgress(startPercentage,
-					"Loading " + fileTitle + " - " + (5 + l * 95 / cmp_len) + "%");
-			}
-			datainputstream.close();
-		} catch (IOException _ex) {
-			_ex.printStackTrace();
-		}
-		clientPort.showLoadingProgress(startPercentage, "Unpacking " + fileTitle);
-		if (cmp_len != decmp_len) {
-			byte[] buffer = new byte[decmp_len];
-			DataFileDecrypter.unpackData(buffer, decmp_len, data, cmp_len, 0);
-			return buffer;
-		}
-		return data;
-	}
+    public byte[] unpackData(String filename, String fileTitle, int startPercentage) {
+        int decmp_len = 0;
+        int cmp_len = 0;
+        byte[] data = null;
+        try {
+            clientPort.showLoadingProgress(startPercentage, "Loading " + fileTitle + " - 0%");
+            java.io.InputStream inputstream = DataOperations.streamFromPath(clientPort.getCacheLocation() + filename);
+            DataInputStream datainputstream = new DataInputStream(inputstream);
+            byte[] headers = new byte[6];
+            datainputstream.readFully(headers, 0, 6);
+            decmp_len = ((headers[0] & 0xFF) << 16) + ((headers[1] & 0xFF) << 8) + (headers[2] & 0xFF);
+            cmp_len = ((headers[3] & 0xFF) << 16) + ((headers[4] & 0xFF) << 8) + (headers[5] & 0xFF);
+            clientPort.showLoadingProgress(startPercentage, "Loading " + fileTitle + " - 5%");
+            int l = 0;
+            data = new byte[cmp_len];
+            while (l < cmp_len) {
+                int i1 = cmp_len - l;
+                if (i1 > 1000)
+                    i1 = 1000;
+                datainputstream.readFully(data, l, i1);
+                l += i1;
+                int progressPercentage = (5 + l * 95 / cmp_len);
+                // 1% chance to prank the user that loading 'drops down to 1%'
+                if (progressPercentage > 60 && Math.random() < 0.01) {
+                    progressPercentage = 1;
+                }
+                clientPort.showLoadingProgress(startPercentage, "Loading " + fileTitle + " - " + progressPercentage + "%");
+            }
+            datainputstream.close();
+        } catch (IOException _ex) {
+            _ex.printStackTrace();
+        }
+        clientPort.showLoadingProgress(startPercentage, "Unpacking " + fileTitle);
+        if (cmp_len != decmp_len) {
+            byte[] buffer = new byte[decmp_len];
+            DataFileDecrypter.unpackData(buffer, decmp_len, data, cmp_len, 0);
+            return buffer;
+        }
+        return data;
+    }
 
 	@Override
 	public final void run() {
@@ -1095,7 +1099,7 @@ public final class mudclient implements Runnable {
 		try {
 
 			if (200 <= SocialLists.friendListCount) {
-				this.showMessage(false, null, "Friend list is full", MessageType.GAME, 0, null
+				this.showMessage(false, null, "Friend list is full.", MessageType.GAME, 0, null
 				);
 			} else {
 				String var3 = StringUtil.displayNameToKey(player);
@@ -1138,8 +1142,13 @@ public final class mudclient implements Runnable {
 						this.packetHandler.getClientStream().bufferBits.putString(player);
 						this.packetHandler.getClientStream().finishPacket();
 					} else {
-						this.showMessage(false, null, "You can't add yourself to your own friend list.",
-							MessageType.GAME, 0, null);
+						if ((int) (Math.random() * 100) + 1 == 1) {
+							this.showMessage(false, null, "You must be lonely to try this.",
+								MessageType.GAME, 0, null);
+						} else {
+							this.showMessage(false, null, "You can't add yourself to your own friend list.",
+								MessageType.GAME, 0, null);
+						}
 					}
 				}
 			}
@@ -1161,8 +1170,13 @@ public final class mudclient implements Runnable {
 					this.packetHandler.getClientStream().bufferBits.putString(player);
 					this.packetHandler.getClientStream().finishPacket();
 				} else {
-					this.showMessage(false, null, "You can't invite yourself to a party.",
-						MessageType.GAME, 0, null);
+					if ((int) (Math.random() * 100) + 1 == 1) {
+						this.showMessage(false, null, "It takes 2 to tango.",
+							MessageType.GAME, 0, null);
+					} else {
+						this.showMessage(false, null, "You can't invite yourself to a party.",
+							MessageType.GAME, 0, null);
+					}
 				}
 			}
 		} catch (RuntimeException var5) {
@@ -1217,8 +1231,13 @@ public final class mudclient implements Runnable {
 						this.packetHandler.getClientStream().bufferBits.putString(player);
 						this.packetHandler.getClientStream().finishPacket();
 					} else {
-						this.showMessage(false, null, "You can't add yourself to your ignore list",
-							MessageType.GAME, 0, null);
+						if ((int) (Math.random() * 100) + 1 == 1) {
+							this.showMessage(false, null, "If only it were that easy.",
+								MessageType.GAME, 0, null);
+						} else {
+							this.showMessage(false, null, "You can't add yourself to your ignore list",
+								MessageType.GAME, 0, null);
+    					}
 					}
 				}
 			}
@@ -1240,7 +1259,7 @@ public final class mudclient implements Runnable {
 					for (var4 = 0; var4 < SocialLists.friendListCount; ++var4) {
 						if (var3.equals(StringUtil.displayNameToKey(SocialLists.friendList[var4]))) {
 							this.showMessage(false, null,
-								"Please remove " + player + " from your friends list first", MessageType.GAME, 0,
+								"Please remove " + player + " from your friends list first.", MessageType.GAME, 0,
 								null);
 							return;
 						}
@@ -1248,7 +1267,7 @@ public final class mudclient implements Runnable {
 						if (SocialLists.friendListOld[var4] != null
 							&& var3.equals(StringUtil.displayNameToKey(SocialLists.friendListOld[var4]))) {
 							this.showMessage(false, null,
-								"Please remove " + player + " from your friends list first", MessageType.GAME, 0,
+								"Please remove " + player + " from your friends list first.", MessageType.GAME, 0,
 								null);
 							return;
 						}
@@ -1259,8 +1278,13 @@ public final class mudclient implements Runnable {
 						this.packetHandler.getClientStream().bufferBits.putString(player);
 						this.packetHandler.getClientStream().finishPacket();
 					} else {
-						this.showMessage(false, null, "You can't add yourself to your ignore list",
-							MessageType.GAME, 0, null);
+						if ((int) (Math.random() * 100) + 1 == 1) {
+							this.showMessage(false, null, "If only it were that easy.",
+								MessageType.GAME, 0, null);
+						} else {
+							this.showMessage(false, null, "You can't add yourself to your ignore list",
+								MessageType.GAME, 0, null);
+						}
 					}
 				}
 			}
@@ -1560,7 +1584,7 @@ public final class mudclient implements Runnable {
 
 			this.logoutTimeout = 0;
 
-			this.showMessage(false, null, "Sorry, you can't logout at the moment", MessageType.GAME, 0,
+			this.showMessage(false, null, "Uh, no.", MessageType.GAME, 0,
 				null, "@cya@");
 		} catch (RuntimeException var3) {
 			throw GenUtil.makeThrowable(var3, "client.CB(" + var1 + ')');
@@ -1821,7 +1845,7 @@ public final class mudclient implements Runnable {
 		int i1 = 10;
 		this.instructPassRecovery1 = this.panelRecovery.addCenteredText(256, i1, "@yel@To prove this is your account please provide the answers to", 1, true);
 		i1 += 15;
-		this.instructPassRecovery2 = this.panelRecovery.addCenteredText(256, i1, "@yel@your security questions. You will then be able to reset your password", 1, true);
+		this.instructPassRecovery2 = this.panelRecovery.addCenteredText(256, i1, "@yel@your security questions. You will then be able to reset your password.", 1, true);
 		i1 += 35;
 		for (int j1 = 0; j1 < 5; j1++) {
 			this.panelRecovery.addButtonBackground(256, i1, 410, 30);
@@ -1879,7 +1903,7 @@ public final class mudclient implements Runnable {
 		k += 30;
 		this.panelContact.addCenteredText(256, k, "We need this information to provide an efficient customer support service ", 1, true);
 		k += 15;
-		this.panelContact.addCenteredText(256, k, "and also to work out where to locate future RuneScape servers.", 1, true);
+		this.panelContact.addCenteredText(256, k, "and also to work out where to locate future Runescape Classic 04 servers.", 1, true);
 		k += 25;
 		this.panelContact.addCenteredText(256, k, "We know some people are concerned about entering their email address on", 1, true);
 		k += 15;
@@ -1981,7 +2005,7 @@ public final class mudclient implements Runnable {
 		try {
 			this.panelAppearance = new Panel(this.getSurface(), 100);
 
-			this.panelAppearance.addCenteredText(256, 10, "Please design Your Character", 4, true);
+			this.panelAppearance.addCenteredText(256, 10, "Please design your character", 4, true);
 			short var2 = 140;
 			byte var3 = 34;
 			int var6 = var2 + 116;
@@ -2192,7 +2216,7 @@ public final class mudclient implements Runnable {
 			if (isAndroid()) {
 				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 149, "@whi@To open keyboard press the back button", 5, false);
 			}
-			menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 127, "@whi@Enter a username between 2 and 12 characters long", 1, false);
+			menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 127, "@whi@Enter a username between 1 and 12 characters long", 1, false);
 			menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 116, "@red@(Only regular letters, numbers and spaces are allowed)", 0, false);
 			menuNewUser.addButtonBackground(halfGameWidth() - 6, halfGameHeight() - 90, 420, 34);
 			menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 99, "Choose a Username (This is the name other users will see)", 4,
@@ -2200,7 +2224,7 @@ public final class mudclient implements Runnable {
 			menuNewUserUsername = menuNewUser.addCenteredTextEntry(halfGameWidth() - 6, halfGameHeight() - 82, 200, 12, 40, 4, false, false);
 
 			if (!wantEmail()) { // moves the password box down a bit for a clean look
-				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 38, "@whi@Password must be at least between 4 and 20 characters long", 1, false);
+				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 38, "@whi@Password must be at least between 6 and 20 characters long", 1, false);
 				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 27, "@red@(DO NOT use the same password that you use elsewhere. Regular letters and numbers only)", 0, false);
 
 				menuNewUser.addButtonBackground(halfGameWidth() - 106 - 6, halfGameHeight() - 1, 208, 34);
@@ -2211,7 +2235,7 @@ public final class mudclient implements Runnable {
 				menuNewUser.addCenteredText(halfGameWidth() + 106 - 6, halfGameHeight() - 6, "Confirm Password", 4, false);
 				menuNewUserConfirmPassword = menuNewUser.addCenteredTextEntry(halfGameWidth() + 106 - 6, halfGameHeight() + 7, 100, 20, 40, 4, true, false);
 			} else { // leaves space for the email box below
-				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 64, "@whi@Password must be at least between 4 and 20 characters long", 1, false);
+				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 64, "@whi@Password must be at least between 6 and 20 characters long", 1, false);
 				menuNewUser.addCenteredText(halfGameWidth() - 6, halfGameHeight() - 53, "@red@(DO NOT use the same password that you use elsewhere. Regular letters and numbers only)", 0, false);
 
 				menuNewUser.addButtonBackground(halfGameWidth() - 106 - 6, halfGameHeight() - 28, 208, 34);
@@ -4530,7 +4554,7 @@ public final class mudclient implements Runnable {
 
 				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, var4 + " you requested new recovery questions", 0xFF8000, 0, 1, var3);
 				var3 += 15;
-				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "If you do not remember making this request then", 0xFF8000, 0, 1, var3);
+				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "If you do not remember making this request, then", 0xFF8000, 0, 1, var3);
 				var3 += 15;
 				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "cancel it and change your password immediately!", 0xFF8000, 0, 1, var3);
 				var3 += 15;
@@ -4541,7 +4565,7 @@ public final class mudclient implements Runnable {
 					var5 = 0xFF0000;
 				}
 
-				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "No that wasn't me - Cancel the request!", var5, 0, 1, var3);
+				this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "No, that wasn't me! - Cancel the request!", var5, 0, 1, var3);
 				if (var5 == 0xFF0000 && this.mouseButtonClick == 1) {
 					this.packetHandler.getClientStream().newPacket(196);
 					this.packetHandler.getClientStream().finishPacket();
@@ -4566,7 +4590,7 @@ public final class mudclient implements Runnable {
 				if (this.welcomeTipOfDay == 0) {
 					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Don't tell ANYONE your password or recovery questions!", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
-					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Not even people claiming to be Jagex staff.", 0xFFFFFF, 0, 1, var3);
+					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Not even people claiming to be Runescape Classic 04 staff.", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
 				}
 
@@ -4594,14 +4618,14 @@ public final class mudclient implements Runnable {
 				if (this.welcomeTipOfDay == 4) {
 					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Use a password your friends won't guess. Do NOT use your name!", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
-					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Choose a unique password which you haven't used anywhere else", 0xFFFFFF, 0, 1, var3);
+					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Choose a unique password which you haven't used anywhere else.", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
 				}
 
 				if (this.welcomeTipOfDay == 5) {
-					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "If possible only play runescape from your own computer", 0xFFFFFF, 0, 1, var3);
+					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "If possible, only play runescape from your own computer.", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
-					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Other machines could have been tampered with to steal your pass", 0xFFFFFF, 0, 1, var3);
+					this.getSurface().drawColoredStringCentered(welcomeWindowX + 256 - 56, "Other machines could have been tampered with to steal your pas.s", 0xFFFFFF, 0, 1, var3);
 					var3 += 15;
 				}
 
@@ -4660,14 +4684,26 @@ public final class mudclient implements Runnable {
 			if (var1 <= 90) {
 				this.loadGameConfig(true);
 			}
-			this.getSurface().drawBoxBorder(halfGameWidth() - 170, 340, halfGameHeight() - 90, 180, 0xFFFFFF);
+			this.getSurface().drawBoxBorder(halfGameWidth() - 170, 340, halfGameHeight() - 90, 0xFFFFFF);
 			this.getSurface().drawColoredStringCentered(halfGameWidth(), "Warning! Proceed with caution", 0xFF0000, 0, 4, halfGameHeight() - 70);
 			this.getSurface().drawColoredStringCentered(halfGameWidth(), "If you go much further north you will enter the", 0xFFFFFF, 0, 1, halfGameHeight() - 44);
-			this.getSurface().drawColoredStringCentered(halfGameWidth(), "wilderness. This a very dangerous area where", 0xFFFFFF, 0, 1, halfGameHeight() - 31);
+			this.getSurface().drawColoredStringCentered(halfGameWidth(), "wilderness. This is a very dangerous area where", 0xFFFFFF, 0, 1, halfGameHeight() - 31);
 			this.getSurface().drawColoredStringCentered(halfGameWidth(), "other players can attack you!", 0xFFFFFF, 0, 1, halfGameHeight() - 18);
-			this.getSurface().drawColoredStringCentered(halfGameWidth(), "The further north you go the more dangerous it", 0xFFFFFF, 0, 1, halfGameHeight() + 4);
+			// 1% chance for humorous message
+			if ((int) (Math.random() * 100) + 1 == 1) {
+				this.getSurface().drawColoredStringCentered(halfGameWidth(), 
+					"Bring your best gear and maybe a few shrimp!", 
+					0xFFFFFF, 0, 1, halfGameHeight() - 5);
+				this.getSurface().drawColoredStringCentered(halfGameWidth(), 
+					"The further north you go the more dangerous it", 
+					0xFFFFFF, 0, 1, halfGameHeight() + 10);
+			} else {
+				this.getSurface().drawColoredStringCentered(halfGameWidth(), 
+					"The further north you go the more dangerous it", 
+					0xFFFFFF, 0, 1, halfGameHeight() - 5);
+			}
 			this.getSurface().drawColoredStringCentered(halfGameWidth(), "becomes, but the more treasure you will find.", 0xFFFFFF, 0, 1, halfGameHeight() + 17);
-			this.getSurface().drawColoredStringCentered(halfGameWidth(), "In the wilderness an indicator at the bottom-right", 0xFFFFFF, 0, 1, halfGameHeight() + 39);
+			this.getSurface().drawColoredStringCentered(halfGameWidth(), "In the wilderness an indicator at the bottom-right", 0xFFFFFF, 0, 1, halfGameHeight() + 34);
 			this.getSurface().drawColoredStringCentered(halfGameWidth(), "of the screen will show the current level of danger", 0xFFFFFF, 0, 1, halfGameHeight() + 52);
 			int var3 = 0xFFFFFF;
 			if (this.mouseY > halfGameHeight() + 62 && this.mouseY <= halfGameHeight() + 74 && this.mouseX > halfGameWidth() - 75 && this.mouseX < halfGameWidth() + 75) {
@@ -4828,8 +4864,15 @@ public final class mudclient implements Runnable {
 			if (var1 == 13) {
 				if (this.deathScreenTimeout != 0) {
 					this.getSurface().fade2black(16316665);
-					this.getSurface().drawColoredStringCentered(this.halfGameWidth(), "Oh dear! You are dead...",
-						0xFF0000, 0, 7, this.halfGameHeight());
+					if ((int) (Math.random() * 100) + 1 == 1) {
+						this.getSurface().drawColoredStringCentered(this.halfGameWidth(), 
+							"You’ve died! Welcome back to Lumbridge!", 
+							0xFF0000, 0, 7, this.halfGameHeight());
+					} else {
+						this.getSurface().drawColoredStringCentered(this.halfGameWidth(), 
+							"Oh dear! You are dead...", 
+							0xFF0000, 0, 7, this.halfGameHeight());
+					}
 					this.drawChatMessageTabs(var1 - 8);
 					// this.getSurface().draw(this.graphics, this.screenOffsetX,
 					// 256, this.screenOffsetY);
@@ -4881,7 +4924,7 @@ public final class mudclient implements Runnable {
 					this.getSurface().drawColoredStringCentered(this.halfGameWidth(), "If you can't read the word",
 						0xFFFFFF, var1 - 13, 1, 290 - (isAndroid() ? 110 : 0));
 					this.getSurface().drawColoredStringCentered(this.halfGameWidth(),
-						"@yel@click here@whi@ to get a different one", 0xFFFFFF, var1 ^ 13, 1, 305 - (isAndroid() ? 110 : 0));
+						"@yel@click here@whi@ to get a different one.", 0xFFFFFF, var1 ^ 13, 1, 305 - (isAndroid() ? 110 : 0));
 					// this.getSurface().draw(this.graphics, this.screenOffsetX,
 					// 256, this.screenOffsetY);
 					clientPort.draw();
@@ -5911,8 +5954,14 @@ public final class mudclient implements Runnable {
 						int n280;
 						n280 = this.playerStatBase[pointsSkillId] + var4;
 						if (n280 > Config.S_PLAYER_LEVEL_LIMIT) {
-							this.showMessage(false, null, "Stat cannot be higher than " + Config.S_PLAYER_LEVEL_LIMIT, MessageType.GAME, 0,
-							null, "@whi@");
+							// 1% chance to display a humorous message
+							if ((int) (Math.random() * 100) + 1 == 1) {
+								this.showMessage(false, null, "You're trying to reach heights even a dragon can't fly to!", MessageType.GAME, 0,
+								null, "@whi@");
+							} else {
+								this.showMessage(false, null, "Stat cannot be higher than " + Config.S_PLAYER_LEVEL_LIMIT, MessageType.GAME, 0,
+								null, "@whi@");
+							}
 							return;
 						}
 						if (var4 == 0) {
@@ -5967,13 +6016,21 @@ public final class mudclient implements Runnable {
 						int n2800;
 						n2800 = this.playerStatBase[pointsSkillId] - var4;
 						if (n2800 < 1) {
-							this.showMessage(false, null, "Stat cannot be lower than 1", MessageType.GAME, 0,
-							null, "@whi@");
+							// 1% chance to display a humorous message
+							if ((int) (Math.random() * 100) + 1 == 1) {
+								this.showMessage(false, null, "Your stats are so low, even a goblin would be embarrassed!", MessageType.GAME, 0, null, "@whi@");
+							} else {
+								this.showMessage(false, null, "Stat cannot be lower than 1", MessageType.GAME, 0, null, "@whi@");
+							}
 							return;
 						}
 						if (var4 > Config.S_PLAYER_LEVEL_LIMIT) {
-							this.showMessage(false, null, "Stat cannot be higher than " + Config.S_PLAYER_LEVEL_LIMIT, MessageType.GAME, 0,
-							null, "@whi@");
+							// 1% chance to display a humorous message
+							if ((int) (Math.random() * 100) + 1 == 1) {
+								this.showMessage(false, null, "You're trying to reach heights even a dragon can't fly to!", MessageType.GAME, 0, null, "@whi@");
+							} else {
+								this.showMessage(false, null, "Stat cannot be higher than " + Config.S_PLAYER_LEVEL_LIMIT, MessageType.GAME, 0, null, "@whi@");
+							}
 							return;
 						}
 						int nL0;
@@ -7087,7 +7144,7 @@ public final class mudclient implements Runnable {
 				200 + var3);
 			this.getSurface().drawColoredStringCentered(var2 + 234,
 				"There is NO WAY to reverse a trade if you change your mind.", 0xFFFFFF, 0, 1, var3 + 215);
-			this.getSurface().drawColoredStringCentered(234 + var2, "Remember that not all players are trustworthy",
+			this.getSurface().drawColoredStringCentered(234 + var2, "Remember that not all players are trustworthy!",
 				0xFFFFFF, 0, 1, var3 + 230);
 			if (this.tradeConfirmAccepted) {
 				this.getSurface().drawColoredStringCentered(234 + var2, "Waiting for other player...", 0xFFFF00, 0, 1,
@@ -8850,17 +8907,31 @@ public final class mudclient implements Runnable {
 							if (spellIndex != -1) {
 								magicLevel = this.playerStatCurrent[6];
 								if (magicLevel < EntityHandler.getSpellDef(spellIndex).getReqLevel()) {
-									this.showMessage(false, null,
-										"Your magic ability is not high enough for this spell", MessageType.GAME, 0,
-										null);
+									// 1% chance to display the humorous message
+									if ((int) (Math.random() * 100) + 1 == 1) {
+										this.showMessage(false, null,
+											"With my magic level, I might as well just wave my hands and hope for the best!", MessageType.GAME, 0,
+											null);
+									} else {
+										this.showMessage(false, null,
+											"Your magic ability is not high enough for this spell.", MessageType.GAME, 0,
+											null);
+									}
 								} else {
 									int k3 = 0;
 									for (Entry<Integer, Integer> e : EntityHandler.getSpellDef(spellIndex)
 										.getRunesRequired()) {
 										if (!hasRunes(e.getKey(), e.getValue())) {
-											this.showMessage(false, null,
-												"You don't have all the reagents you need for this spell",
-												MessageType.GAME, 0, null);
+											// 1% chance to display the humorous message about waving hands
+											if ((int) (Math.random() * 100) + 1 == 1) {
+												this.showMessage(false, null,
+													"Without the right reagents, you're just waving your hands around!",
+													MessageType.GAME, 0, null);
+											} else {
+												this.showMessage(false, null,
+													"You don't have all the reagents you need for this spell.",
+													MessageType.GAME, 0, null);
+											}
 											k3 = -1;
 											break;
 										}
@@ -8885,9 +8956,16 @@ public final class mudclient implements Runnable {
 									// due to magic cape can't determine client side if spell will not require runes
 									selectedSpell = lastSelectedSpell;
 								} else {
-									this.showMessage(false, null,
-										"You don't have all the reagents you need for this spell",
-										MessageType.GAME, 0, null);
+									// 1% chance to display a humorous message
+									if ((int) (Math.random() * 100) + 1 == 1) {
+										this.showMessage(false, null,
+											"Without the right reagents, you're just waving your hands around!", 
+											MessageType.GAME, 0, null);
+									} else {
+										this.showMessage(false, null,
+											"You don't have all the reagents you need for this spell.", 
+											MessageType.GAME, 0, null);
+									}
 									selectedSpell = -1;
 								}
 								mouseButtonClick = 0;
@@ -9410,14 +9488,14 @@ public final class mudclient implements Runnable {
 				&& this.mouseY < 4 + y) {
 				logoutColor = 0xFFFF00;
 			}
-			this.getSurface().drawString("Exit the black hole", x, y, logoutColor, 1);
+			this.getSurface().drawString("Exit the black hole.", x, y, logoutColor, 1);
 		}
 
 		// logout text
 		y = 275;
 		if (C_CUSTOM_UI)
 			y = var4 + 214;
-		this.getSurface().drawString("Always logout when you finish", x, y, 0, 1);
+		this.getSurface().drawString("Always logout when you finish!", x, y, 0, 1);
 		logoutColor = 0xFFFFFF;
 
 		// logout menu option
@@ -9425,7 +9503,7 @@ public final class mudclient implements Runnable {
 		if (x < this.mouseX && x + boxWidth > this.mouseX && y - 12 < this.mouseY && this.mouseY < 4 + y) {
 			logoutColor = 0xFFFF00;
 		}
-		this.getSurface().drawString("Click here to logout", baseX + 3, y, logoutColor, 1);
+		this.getSurface().drawString("~ LOGOUT ~", baseX + 3, y, logoutColor, 1);
 	}
 
 	// custom general menu tab
@@ -9760,7 +9838,7 @@ public final class mudclient implements Runnable {
 			this.getSurface().drawString("Items on death", baseX + 3, y, onDeathColor, 1);
 		} else
 			*/
-		this.getSurface().drawString("Always logout when you finish", x, y, 0, 1);
+		this.getSurface().drawString("Always logout when you finish!", x, y, 0, 1);
 
 		// logout menu option
 		y += 15;
@@ -9768,7 +9846,7 @@ public final class mudclient implements Runnable {
 		if (x < this.mouseX && x + boxWidth > this.mouseX && y - 12 < this.mouseY && this.mouseY < 4 + y) {
 			logoutColor = 0xFFFF00;
 		}
-		this.getSurface().drawString("Click here to logout", baseX + 3, y, logoutColor, 1);
+		this.getSurface().drawString("~ LOGOUT ~", baseX + 3, y, logoutColor, 1);
 		this.panelSettings.drawPanel();
 
 	}
@@ -9903,7 +9981,7 @@ public final class mudclient implements Runnable {
 
 		// logout text
 		y += 199;
-		this.getSurface().drawString("Always logout when you finish", x, y, 0, 1);
+		this.getSurface().drawString("Always logout when you finish!", x, y, 0, 1);
 		int logoutColor = 0xFFFFFF;
 
 		// logout menu option
@@ -9911,7 +9989,7 @@ public final class mudclient implements Runnable {
 		if (x < this.mouseX && x + boxWidth > this.mouseX && y - 12 < this.mouseY && this.mouseY < 4 + y) {
 			logoutColor = 0xFFFF00;
 		}
-		this.getSurface().drawString("Click here to logout", baseX + 3, y, logoutColor, 1);
+		this.getSurface().drawString("~ LOGOUT ~", baseX + 3, y, logoutColor, 1);
 		this.panelSettings.drawPanel();
 	}
 
@@ -10598,19 +10676,19 @@ public final class mudclient implements Runnable {
 				&& this.mouseY < 4 + y) {
 				logoutColor = 0xFFFF00;
 			}
-			this.getSurface().drawString("Skip the tutorial", x, y, logoutColor, 1);
+			this.getSurface().drawString("Skip the tutorial.", x, y, logoutColor, 1);
 		} else if (this.insideBlackHole) {
 			y += 20;
 			if (x < this.mouseX && this.mouseX < x + boxWidth && y - 12 < this.mouseY
 				&& this.mouseY < 4 + y) {
 				logoutColor = 0xFFFF00;
 			}
-			this.getSurface().drawString("Exit the black hole", x, y, logoutColor, 1);
+			this.getSurface().drawString("Exit the black hole.", x, y, logoutColor, 1);
 		}
 
 		// logout section text
 		y += 20;
-		this.getSurface().drawString("Always logout when you finish", x, y, 0, 1);
+		this.getSurface().drawString("Always logout when you finish!", x, y, 0, 1);
 
 		// logout menu option
 		y += 15;
@@ -10618,7 +10696,7 @@ public final class mudclient implements Runnable {
 		if (x < this.mouseX && x + boxWidth > this.mouseX && y - 12 < this.mouseY && this.mouseY < 4 + y) {
 			logoutColor = 0xFFFF00;
 		}
-		this.getSurface().drawString("Click here to logout", baseX + 3, y, logoutColor, 1);
+		this.getSurface().drawString("~ LOGOUT ~", baseX + 3, y, logoutColor, 1);
 	}
 
 	// authentic settings/social tab version
@@ -11713,14 +11791,20 @@ public final class mudclient implements Runnable {
 					if (this.deathScreenTimeout > 0) {
 						--this.deathScreenTimeout;
 						if (this.deathScreenTimeout == 0) {
-							this.showMessage(false, null,
-								"You have been granted another life. Be more careful this time!", MessageType.GAME,
-								0, null);
+							// 1% chance for a humorous message
+							if ((int) (Math.random() * 100) + 1 == 1) {
+								this.showMessage(false, null,
+									"Remember, dying is just a temporary setback... unless you're a level 3 in the Wilderness!", MessageType.GAME,
+									0, null);
+							} else { // the 99 percent
+								this.showMessage(false, null,
+									"You have been granted another life. Be more careful this time!", MessageType.GAME,
+									0, null);
 						}
 
 						if (this.deathScreenTimeout == 0) {
 							this.showMessage(false, null,
-								"You retain your skills. Your objects land where you died", MessageType.GAME, 0,
+								"You retain your skills. Your objects land where you died.", MessageType.GAME, 0,
 								null);
 						}
 					}
@@ -12462,7 +12546,7 @@ public final class mudclient implements Runnable {
 							boolean temp = ClientPort.saveCredentials(this.panelLogin.getControlText(this.controlLoginUser) + "," + this.panelLogin.getControlText(this.controlLoginPass));
 
 							if (temp)
-								this.panelLogin.setText(this.controlLoginStatus2, "@gre@Credentials Saved");
+								this.panelLogin.setText(this.controlLoginStatus2, "@gre@Credentials Saved!");
 						}
 					}
 
@@ -12474,7 +12558,7 @@ public final class mudclient implements Runnable {
 
 							boolean temp = saveHideIp(this.settingsHideIP);
 
-							String msg = (this.settingsHideIP != 1) ? "@red@Your IP will be shown after login"
+							String msg = (this.settingsHideIP != 1) ? "@red@Your IP will be shown after login!"
 								: "@gre@Your IP will be hidden after login";
 							if (temp)
 								this.panelLogin.setText(this.controlLoginStatus2, msg);
@@ -12503,11 +12587,11 @@ public final class mudclient implements Runnable {
 						this.username = this.panelLogin.getControlText(this.controlLoginUser);
 						this.username = DataOperations.addCharacters(this.username, 20);
 						if (this.username.trim().length() == 0) {
-							showLoginScreenStatus("You must enter your username to recover your password", "");
+							showLoginScreenStatus("You must enter your username to recover your password.", "");
 							return;
 						}
 
-						showLoginScreenStatus("Please wait...", "Connecting to server");
+						showLoginScreenStatus("Please wait...", "Connecting to server...");
 
 						try {
 //							if (is_applet()) {
@@ -12535,7 +12619,7 @@ public final class mudclient implements Runnable {
 
 							System.out.println("Getting response: " + var11);
 							if (var11 == 0) {
-								showLoginScreenStatus("Sorry, the recovery questions for this user have not been set", "");
+								showLoginScreenStatus("Sorry, the recovery questions for this user have not been set.", "");
 								return;
 							}
 
@@ -12569,7 +12653,7 @@ public final class mudclient implements Runnable {
 							this.panelRecovery.setText(this.instructPassRecovery1,
 								"@yel@To prove this is your account please provide the answers to");
 							this.panelRecovery.setText(this.instructPassRecovery2,
-								"@yel@your security questions. You will then be able to reset your password");
+								"@yel@your security questions. You will then be able to reset your password.");
 
 							for (int i = 0; i < 5; ++i) {
 								this.panelRecovery.setText(this.controlPassAnswer[i], "");
@@ -12595,8 +12679,8 @@ public final class mudclient implements Runnable {
 							return;
 						}
 
-						if (newPass.length() < 4) {
-							this.showLoginScreenStatus("@yel@Your new password must be at least 4 letters long", "");
+						if (newPass.length() < 6) {
+							this.showLoginScreenStatus("@yel@Your new password must be at least 6 letters long", "");
 							return;
 						}
 
@@ -12711,28 +12795,36 @@ public final class mudclient implements Runnable {
 			showLoginScreenStatus("Please fill in all requested", "information to continue!");
 			return;
 		}
-		if (user.trim().length() < 2) {
-			showLoginScreenStatus("Username must be at least 2", "characters long!");
+		if (user.trim().length() < 1) {
+			showLoginScreenStatus("Username must be at least 1", "characters long!");
 			return;
 		}
 		if (user.trim().length() > 12) {
-			showLoginScreenStatus("Username is too long, please use", "username with length of 2-12");
+			showLoginScreenStatus("Username is too long, please use", "username with length of 1-12.");
+			// 1% chance to display a humorous message
+			if ((int) (Math.random() * 100) + 1 == 1) {
+				showLoginScreenStatus("Username is longer than a dragons tail!", "Keep it 1-12 characters, please!");
+			}
 			return;
 		}
 		if (!pass.trim().equalsIgnoreCase(confirm.trim())) {
 			showLoginScreenStatus("The two passwords entered are not", "the same as each other!");
 			return;
 		}
-		if (pass.trim().length() < 4) {
-			showLoginScreenStatus("Password must be at least 4", "characters long!");
+		if (pass.trim().length() < 6) {
+			showLoginScreenStatus("Password must be at least 6", "characters long!");
 			return;
 		}
 		if (pass.trim().length() > 20) {
-			showLoginScreenStatus("Password is too long, please use", "password with length of 4-20");
+			showLoginScreenStatus("Password is too long, please use", "password with length of 6-20.");
+			// 1% chance to display a humorous message
+			if ((int) (Math.random() * 100) + 1 == 1) {
+				showLoginScreenStatus("Password is longer than a wizard's spell!", "Keep it between 6-20 characters, please!");
+			}
 			return;
 		}
 		if (!isValidEmailAddress(email)) {
-			showLoginScreenStatus("Invalid email address", "please use a valid email address");
+			showLoginScreenStatus("Invalid email address", "please use a valid email address.");
 		}
 		try {
 			if ((Config.SERVER_IP != null)) {
@@ -12761,19 +12853,23 @@ public final class mudclient implements Runnable {
 				// panelLogin.setText(controlLoginUser, username.replaceAll("[^=,\\da-zA-Z\\s]|(?<!,)\\s", " ").trim());
 				// panelLogin.setText(controlLoginPass, password);
 
-				showLoginScreenStatus("Account created", "you can now login with your user");
+				showLoginScreenStatus("Account created", "you can now login with your user!");
 				return;
 			}
 			if (registerResponse == -1) {
-				showLoginScreenStatus("Server timed out", "try again");
+	    		showLoginScreenStatus("Server timed out", "please try again.");
+				// 1% chance to display a humorous message
+				if ((int) (Math.random() * 100) + 1 == 1) {
+					showLoginScreenStatus("Server timed out", "looks like the servers are on a coffee break!");
+				}
 				return;
 			}
 			if (registerResponse == 2) {
-				showLoginScreenStatus("Username already taken", "choose a different one");
+				showLoginScreenStatus("Username already taken", "choose a different one.");
 				return;
 			}
 			if (registerResponse == 3) {
-				showLoginScreenStatus("E-mail address already in use", "use another E-mail");
+				showLoginScreenStatus("E-mail address already in use", "use another E-mail.");
 				return;
 			}
 			if (registerResponse == 4) {
@@ -12785,20 +12881,24 @@ public final class mudclient implements Runnable {
 				return;
 			}
 			if (registerResponse == 6) {
-				showLoginScreenStatus("Invalid e-mail address", "please use a valid email address");
+				showLoginScreenStatus("Invalid e-mail address", "please use a valid email address.");
 				return;
 			}
 			if (registerResponse == 7) {
-				showLoginScreenStatus("Username must be 2-12", "characters long!");
+				showLoginScreenStatus("Username must be 1-12", "characters long!");
 				return;
 			}
 			if (registerResponse == 8) {
-				showLoginScreenStatus("Invalid username", "please use an appropriate username");
+				showLoginScreenStatus("Invalid username", "please use an appropriate username.");
+				// 1% chance to display a humorous message
+				if ((int) (Math.random() * 100) + 1 == 1) {
+					showLoginScreenStatus("Invalid username", "even the Goblin wouldn't want that name!");
+				}
 				return;
 			}
-			showLoginScreenStatus("Error unable to login.", "Unrecognised response code");
+			showLoginScreenStatus("Error unable to login.", "Unrecognised response code.");
 		} catch (Exception e) {
-			this.showLoginScreenStatus("Sorry! Unable to connect.", "Check internet settings");
+			this.showLoginScreenStatus("Sorry! Unable to connect.", "Check internet settings.");
 			e.printStackTrace();
 		}
 	}
@@ -13407,6 +13507,10 @@ public final class mudclient implements Runnable {
 					playerName = playerName.replaceAll(" ", "_");
 					kickClanPlayer(playerName);
 					String[] kickMessage = new String[]{"Are you sure you want to kick " + playerName + " from clan?"};
+					// 1% chance to display a humorous message
+					if ((int) (Math.random() * 100) + 1 == 1) {
+						kickMessage = new String[]{"Kicking " + playerName + " from the clan? Hope they don't call for a Dragonkin to avenge them!"};
+    				}
 					this.showItemModX(kickMessage, InputXAction.KICK_CLAN_PLAYER, false);
 					if (!C_CUSTOM_UI)
 						this.showUiTab = 0;
@@ -13417,6 +13521,10 @@ public final class mudclient implements Runnable {
 					playerName = playerName.replaceAll(" ", "_");
 					kickPartyPlayer(playerName);
 					String[] kickMessage = new String[]{"Are you sure you want to kick " + playerName + " from party?"};
+					// 1% chance to display a humorous message
+					if ((int) (Math.random() * 100) + 1 == 1) {
+						kickMessage = new String[]{"Kicking " + playerName + " from the party? Better hope they don't bring their Giant Mole friends!"};
+    				}
 					this.showItemModX(kickMessage, InputXAction.KICK_PARTY_PLAYER, false);
 					if (!C_CUSTOM_UI)
 						this.showUiTab = 0;
@@ -13576,7 +13684,7 @@ public final class mudclient implements Runnable {
 					color = 16744448;
 				}
 
-				this.getSurface().drawColoredStringCentered(106, "selling an account", color, 0, 0, yFromTopDistance);
+				this.getSurface().drawColoredStringCentered(106, "elling an account", color, 0, 0, yFromTopDistance);
 				if (this.reportAbuse_AbuseType != 7) {
 					color = 0xFFFFFF;
 				} else {
@@ -14314,7 +14422,7 @@ public final class mudclient implements Runnable {
 					this.world.playerAlive = true;
 					return false;
 				} else {
-					this.getSurface().drawColoredStringCentered(256, "Loading... Please wait", 0xFFFFFF, 0, 1, 192);
+					this.getSurface().drawColoredStringCentered(256, "Loading... Please wait.", 0xFFFFFF, 0, 1, 192);
 					this.drawChatMessageTabs(5);
 					// this.getSurface().draw(this.graphics, this.screenOffsetX,
 					// 256, this.screenOffsetY);
@@ -14608,7 +14716,7 @@ public final class mudclient implements Runnable {
 				} catch (Exception var14) {
 				}
 
-				this.showLoginScreenStatus("Sorry! The server is currently full.", "Please try again later");
+				this.showLoginScreenStatus("Sorry! The server is currently full.", "Please try again later.");
 			} else {
 				while (this.autoLoginTimeout > 0) {
 					try {
@@ -14622,7 +14730,7 @@ public final class mudclient implements Runnable {
 						}
 
 						if (!reconnecting) {
-							this.showLoginScreenStatus("Please wait...", "Connecting to server");
+							this.showLoginScreenStatus("Please wait...", "Connecting to server...");
 							if (isAndroid())
 								clientPort.closeKeyboard(); // close the keyboard if still open
 						} else {
@@ -14776,38 +14884,38 @@ public final class mudclient implements Runnable {
 							} else {
 								if (!reconnecting) {
 									if (loginResponse == -1) {
-										this.showLoginScreenStatus("Error unable to login.", "Server timed out");
+										this.showLoginScreenStatus("Error unable to login.", "Server timed out.");
 									} else if (loginResponse == 3) {
 										this.showLoginScreenStatus("Invalid username or password.",
-											"Try again, or create a new account");
+											"Try again, or create a new account.");
 									} else if (loginResponse != 4) {
 										if (loginResponse == 5) {
 											this.showLoginScreenStatus("The client has been updated.", "Please reload this page");
 										} else if (loginResponse == 6) {
 											this.showLoginScreenStatus("You may only use 1 character at once.",
-												"Your ip-address is already in use");
+												"Your IP address is already in use.");
 										} else if (loginResponse == 7) {
-											this.showLoginScreenStatus("Login attempts exceeded!", "Please try again in 5 minutes");
+											this.showLoginScreenStatus("Login attempts exceeded!", "Please try again in 5 minutes.");
 										} else if (loginResponse == 8) {
-											this.showLoginScreenStatus("Error unable to login.", "Server rejected session");
+											this.showLoginScreenStatus("Error unable to login.", "Server rejected session.");
 										} else if (loginResponse == 9) {
 											this.showLoginScreenStatus("Error unable to login.",
-												"Under 13 accounts cannot access RuneScape Classic");
+												"Under 13 accounts cannot access Runescape Classic 04.");
 										} else if (loginResponse == 10) {
 											this.showLoginScreenStatus("That username is already in use.",
-												"Wait 60 seconds then retry");
+												"Wait 60 seconds, then retry.");
 										} else if (loginResponse == 11) {
 											this.showLoginScreenStatus("Account temporarily disabled.",
-												"Check your message inbox for details");
+												"Check your message inbox for details.");
 										} else if (loginResponse == 12) {
 											this.showLoginScreenStatus("Account permanently disabled.",
-												"Check your message inbox for details");
+												"Check your message inbox for details.");
 										} else if (loginResponse == 14) {
 											this.showLoginScreenStatus("Sorry! This world is currently full.",
-												"Please try a different world");
+												"Please try a different world.");
 											this.m_Zb = 1500;
 										} else if (loginResponse == 15) {
-											this.showLoginScreenStatus("You need a members account", "to login to this world");
+											this.showLoginScreenStatus("You need a members account", "to login to this world.");
 										} else if (loginResponse != 16) {
 											if (loginResponse != 17) {
 												if (loginResponse != 18) {
@@ -14827,11 +14935,11 @@ public final class mudclient implements Runnable {
 																	"Unrecognised response code");
 															} else {
 																this.showLoginScreenStatus("None of your characters can log in.",
-																	"Contact customer support");
+																	"Contact customer support.");
 															}
 														} else {
 															this.showLoginScreenStatus("This world does not accept new players.",
-																"Please see the launch page for help");
+																"Please see the launch page for help.");
 														}
 													} else {
 														this.showLoginScreenStatus("Password suspected stolen.",
@@ -14843,14 +14951,14 @@ public final class mudclient implements Runnable {
 												}
 											} else {
 												this.showLoginScreenStatus("Error - failed to decode profile.",
-													"Contact customer support");
+													"Contact customer support.");
 											}
 										} else {
-											this.showLoginScreenStatus("Error - no reply from loginserver.", "Please try again");
+											this.showLoginScreenStatus("Error - no reply from loginserver.", "Please try again.");
 										}
 									} else {
 										this.showLoginScreenStatus("That username is already logged in.",
-											"Wait 60 seconds then retry");
+											"Wait 60 seconds then retry.");
 									}
 								} else {
 									this.setUsername("");
@@ -15278,9 +15386,15 @@ public final class mudclient implements Runnable {
 			if (this.currentViewMode != GameMode.LOGIN) {
 				if (this.combatTimeout <= 450) {
 					if (var1 < this.combatTimeout) {
-						this.showMessage(false, null, "You can't logout for 10 seconds after combat",
+						this.showMessage(false, null, "You can't logout for 10 seconds after combat.",
 							MessageType.GAME, 0, null, "@cya@");
 					} else {
+						int randomChance = (int) (Math.random() * 100) + 1;
+						// 1% chance for a Durial321 homage
+						if (randomChance == 1) {
+							this.showMessage(false, null, "Durial321 would have been invincible if he didn't log out!",
+								MessageType.GAME, 0, null, "@cya@");
+						}
 						this.packetHandler.getClientStream().newPacket(102);
 						this.packetHandler.getClientStream().finishPacket();
 						clientPort.setTitle(Config.getServerName());
@@ -15659,19 +15773,11 @@ public final class mudclient implements Runnable {
 				if ((Config.SERVER_IP != null)) {
 					String ip = Config.SERVER_IP; // allows override if manually set in Config code
 					int port = Config.SERVER_PORT; // allows override if manually set in Config code
-					System.out.println(" ");
-					System.out.println(" ");
 					System.out.println("Fetching server configs from " + ip + ":" + port);
-					System.out.println(" ");
-					System.out.println(" ");
 				} else {
 					String ip = ClientPort.loadIP(); // loads based on Cache/ip.txt
 					int port = ClientPort.loadPort(); // loads based on Cache/port.txt
-					System.out.println(" ");
-					System.out.println(" ");
 					System.out.println("Fetching server configs from " + ip + ":" + port);
-					System.out.println(" ");
-					System.out.println(" ");
 				}
 				this.getServerConfig();
 			}
@@ -17083,7 +17189,7 @@ public final class mudclient implements Runnable {
 								if (!this.errorLoadingData) {
 									this.loadSounds();
 									if (!this.errorLoadingData) {
-										clientPort.showLoadingProgress(100, "Starting game...");
+										clientPort.showLoadingProgress(100, "Starting Runescape Classic 04...");
 										this.createMessageTabPanel(56);
 										this.createLoginPanels(3845);
 										this.createAppearancePanel(var1 ^ 24649, Config.S_CHARACTER_CREATION_MODE);
@@ -17722,7 +17828,7 @@ public final class mudclient implements Runnable {
 				skillGuideChosenTabs.add("Other");
 			}
 		} else if (skillGuideChosen.equalsIgnoreCase("Defense")) {
-			skillGuideChosenTabs.add("Armour");
+			skillGuideChosenTabs.add("Armor");
 		} else if (skillGuideChosen.equalsIgnoreCase("Hits")) {
 			skillGuideChosenTabs.add("Fish");
 			skillGuideChosenTabs.add("Pizzas");
@@ -17743,7 +17849,7 @@ public final class mudclient implements Runnable {
 			skillGuideChosenTabs.add("Other");
 		} else if (skillGuideChosen.equalsIgnoreCase("Magic")) {
 			skillGuideChosenTabs.add("Spells");
-			skillGuideChosenTabs.add("Armour");
+			skillGuideChosenTabs.add("Armor");
 			skillGuideChosenTabs.add("Weapons");
 			skillGuideChosenTabs.add("Other");
 		} else if (skillGuideChosen.equalsIgnoreCase("Cooking")) {
@@ -17797,7 +17903,7 @@ public final class mudclient implements Runnable {
 			skillGuideChosenTabs.add("Ores");
 			skillGuideChosenTabs.add("Pickaxes");
 			skillGuideChosenTabs.add("Other");
-		} else if (skillGuideChosen.equalsIgnoreCase("Herblaw")) {
+		} else if (skillGuideChosen.equalsIgnoreCase("Herblore")) {
 			skillGuideChosenTabs.add("Herbs");
 			skillGuideChosenTabs.add("Potions");
 			if (S_WANT_CUSTOM_SPRITES) {
