@@ -2194,7 +2194,7 @@ public class PacketHandler {
 		}
 
 		// Discord update
-		Discord.setLastUpdate("Banking");
+		Discord.setLastUpdate("Bank standing");
 	}
 
 	private void updateIndividualExperience() {
@@ -2308,7 +2308,7 @@ public class PacketHandler {
 		// Update the discord status
 		final String[] skillNames = {"Attack", "Defense", "Strength", "Hits",
 			"Ranged", "Prayer", "Magic", "Cooking", "Woodcutting", "Fletching",
-			"Fishing", "Firemaking", "Crafting", "Smithing", "Mining", "Herblaw",
+			"Fishing", "Firemaking", "Crafting", "Smithing", "Mining", "Herblore",
 			"Agility", "Thieving", "Runecraft", "Harvesting"};
 		if (skill == 0 || skill == 1 || skill == 2 || skill == 3) {
 			Discord.setLastUpdate("Training Combat");
