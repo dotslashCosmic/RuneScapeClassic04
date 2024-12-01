@@ -104,37 +104,37 @@ public class Eating implements OpInvTrigger {
 				say(player, null, "Ow! I nearly broke a tooth!");
 				player.message("You feel strangely heavier and more tired");
 			} else if (id == ItemId.EQUA_LEAVES.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the leaves..chewy but tasty");
+				player.playerServerMessage(MessageType.QUEST, "You eat the leaves.. chewy but tasty");
 			} else if (id == ItemId.DWELLBERRIES.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the berrys..quite tasty");
+				player.playerServerMessage(MessageType.QUEST, "You eat the berrys.. quite tasty");
 			} else if (id == ItemId.LEMON.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the lemon ..it's very sour");
+				player.playerServerMessage(MessageType.QUEST, "You eat the lemon.. it's very sour");
 			} else if (id == ItemId.LEMON_SLICES.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the lemon slices ..they're very sour");
+				player.playerServerMessage(MessageType.QUEST, "You eat the lemon slices.. they're very sour");
 			} else if (id == ItemId.DICED_LEMON.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the lemon cubes ..they're very sour");
+				player.playerServerMessage(MessageType.QUEST, "You eat the lemon cubes.. they're very sour");
 			} else if (id == ItemId.LIME.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the lime ..it's quite sour");
+				player.playerServerMessage(MessageType.QUEST, "You eat the lime.. it's quite sour");
 			} else if (id == ItemId.LIME_SLICES.id() || id == ItemId.LIME_CHUNKS.id()) {
 				player.playerServerMessage(MessageType.QUEST, "You eat the " + item.getDef(player.getWorld()).getName().toLowerCase() + "..they're quite sour");
 			} else if (id == ItemId.GRAPEFRUIT.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit ...it's somewhat bitter");
+				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit.. it's somewhat bitter");
 			} else if (id == ItemId.GRAPEFRUIT_SLICES.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit slices ...they're somewhat bitter");
+				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit slices.. they're somewhat bitter");
 			} else if (id == ItemId.DICED_GRAPEFRUIT.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit cubes ...they're somewhat bitter");
+				player.playerServerMessage(MessageType.QUEST, "You eat the grapefruit cubes.. they're somewhat bitter");
 			} else if (id == ItemId.ORANGE.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the orange ...yum");
+				player.playerServerMessage(MessageType.QUEST, "You eat the orange.. yum");
 			} else if (id == ItemId.ORANGE_SLICES.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the orange slices ...yum");
+				player.playerServerMessage(MessageType.QUEST, "You eat the orange slices.. yum");
 			} else if (id == ItemId.DICED_ORANGE.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the orange cubes ...yum");
+				player.playerServerMessage(MessageType.QUEST, "You eat the orange cubes.. yum");
 			} else if (id == ItemId.FRESH_PINEAPPLE.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the pineapple ...yum");
+				player.playerServerMessage(MessageType.QUEST, "You eat the pineapple.. yum");
 			} else if (id == ItemId.PINEAPPLE_CHUNKS.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the pineapple chunks ..yum");
+				player.playerServerMessage(MessageType.QUEST, "You eat the pineapple chunks.. yum");
 			} else if (id == ItemId.CREAM.id()) {
-				player.playerServerMessage(MessageType.QUEST, "You eat the cream..you get some on your nose");
+				player.playerServerMessage(MessageType.QUEST, "You eat the cream.. you get some on your nose");
 			} else if (id == ItemId.COOKEDMEAT.id()) {
 				player.playerServerMessage(MessageType.QUEST, "You eat the meat");
 			} else if (id == ItemId.GNOMEBOWL.id()) {
