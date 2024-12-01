@@ -471,7 +471,7 @@ public class Drinkables implements OpInvTrigger {
 		substat(player, Skill.STRENGTH.id(), 4, 0);
 
 		mes("You drink the cocktail");
-		mes("It tastes awful..yuck");
+		mes("It tastes awful.. yuck");
 		player.getCarriedItems().getInventory().add(new Item(ItemId.COCKTAIL_GLASS.id()));
 		resetGnomeBartending(player);
 	}
@@ -484,7 +484,7 @@ public class Drinkables implements OpInvTrigger {
 			healstat(player, Skill.HITS.id(), 8, 0);
 		}
 		mes("You drink the cocktail");
-		mes("yum ..it tastes great");
+		mes("Yum.. it tastes great");
 		mes("You feel reinvigorated");
 		give(player, ItemId.COCKTAIL_GLASS.id(), 1);
 	}
@@ -500,7 +500,7 @@ public class Drinkables implements OpInvTrigger {
 		addstat(player, Skill.STRENGTH.id(), 1, 6);
 
 		mes("You drink the cocktail");
-		mes("yum ..it tastes great");
+		mes("Yum.. it tastes great");
 		mes("although you feel slightly dizzy");
 		give(player, ItemId.COCKTAIL_GLASS.id(), 1);
 	}
